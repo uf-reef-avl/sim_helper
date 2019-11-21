@@ -1,0 +1,39 @@
+<!-- Launches an empty world and simulated vehicles in Gazebo.  Called by Master.py-->
+
+<launch>
+
+  <!-- Spawns the simulated multirotor -->
+  <arg name="multirotor" value="camera_multirotor.launch" />
+
+  <!-- Enables/Disables spawning turtlebots -->
+  <arg name="spawn_turtles" value="False"/>
+
+  <include file="$(find sim_helper)/launch/$(arg multirotor)" />
+
+	<!-- Spawns the turtlebots.  Can add or subtract more bots here. -->
+        <group if="$(arg spawn_turtles)">
+		<group ns="robot0">
+			<include file="$(find sim_helper)/launch/kobuki.launch.xml">
+				<arg name="name" value="robot0" />
+				<arg name="x" value="1.6" />
+				<arg name="y" value="-2.26" />
+			</include>
+		</group>
+		<group ns="robot1">
+			<include file="$(find sim_helper)/launch/kobuki.launch.xml">
+				<arg name="name" value="robot1" />
+				<arg name="x" value="-0.9" />
+				<arg name="y" value="2.25" />
+			</include>
+		</group>
+		<group ns="robot2">
+			<include file="$(find sim_helper)/launch/kobuki.launch.xml">
+				<arg name="name" value="robot2" />
+				<arg name="x" value="-1.83" />
+				<arg name="y" value="1.74" />
+			</include>
+		</group>
+	</group>
+</launch>
+
+
