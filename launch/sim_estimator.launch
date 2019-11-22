@@ -2,7 +2,7 @@
 <launch>
 
 	<!-- Switch between waypoint or dubins path mode with this argument -->
-	<arg name="waypointmode" value="True"/>
+	<arg name="waypointmode" value="false"/>
 
 	<!-- Launches the reef estimator -->
 	<arg name="control_mode" value="altitude_hold"/>
@@ -30,27 +30,27 @@
 	</node>
 
 	<!-- Basic waypoints -->
-        <group if="$(arg waypointmode)">
-	<arg name="waypoints_file" default="$(find setpoint_generator)/waypoint_files/basic_waypoints.yaml" />
-	<node name="setpoint_publisher" pkg="setpoint_generator" type="get_setpoint_node.py" clear_params="true" output="screen">
-		<rosparam file="$(arg waypoints_file)"/>
-		<rosparam file="$(find setpoint_generator)/params/basic_param.yaml"/>
-	</node>
-
-	<rosparam file="$(find sim_helper)/params/$(arg vehicle)_pid.yaml"/>
-	<node name="reef_control_pid" pkg="reef_control" type="reef_control_node" output="screen"/>
+	<group if="$(arg waypointmode)">
+		<arg name="waypoints_file" default="$(find setpoint_generator)/waypoint_files/basic_waypoints.yaml" />
+		<node name="setpoint_publisher" pkg="setpoint_generator" type="get_setpoint_node.py" clear_params="true" output="screen">
+			<rosparam file="$(arg waypoints_file)"/>
+			<rosparam file="$(find setpoint_generator)/params/basic_param.yaml"/>
+		</node>
 	</group>
 
 	<!-- Dubins path -->
-        <group unless="$(arg waypointmode)">
-	<arg name="waypoints_file" default="$(find dubins_path)/waypoint_files/basic_waypoints.yaml"/>
-	<rosparam command="load" file="$(find dubins_path)/param/basic_param.yaml"/>
+	<group unless="$(arg waypointmode)">
+		<arg name="waypoints_file" default="$(find dubins_path)/waypoint_files/basic_waypoints.yaml"/>
+		<rosparam command="load" file="$(find dubins_path)/param/basic_param.yaml"/>
 
-	<node name="setpoint_publisher" pkg="dubins_path" type="get_setpoint_node.py" clear_params="true" output = "screen">
-		<rosparam file="$(arg waypoints_file)" />
-		<remap from="velocity_publisher" to="/mobile_base/commands/velocity"/>
-		<remap from="$(arg vehicle)/ned/pose" to="multirotor/truth/NED"/>
-	</node>
+		<node name="setpoint_publisher" pkg="dubins_path" type="get_setpoint_node.py" clear_params="true" output = "screen">
+			<rosparam file="$(arg waypoints_file)" />
+			<remap from="velocity_publisher" to="/mobile_base/commands/velocity"/>
+			<remap from="$(arg vehicle)/ned/pose" to="multirotor/truth/NED"/>
+		</node>
 	</group>
+
+	<rosparam file="$(find sim_helper)/params/$(arg vehicle)_pid.yaml"/>
+	<node name="reef_control_pid" pkg="reef_control" type="reef_control_node" output="screen"/>
 
 </launch>
