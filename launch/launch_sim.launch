@@ -4,11 +4,11 @@
 
   <!-- Spawns the simulated multirotor -->
   <arg name="multirotor" value="camera_multirotor.launch" />
+  <include file="$(find sim_helper)/launch/$(arg multirotor)" />
+
 
   <!-- Enables/Disables spawning turtlebots -->
   <arg name="spawn_turtles" value="False"/>
-
-  <include file="$(find sim_helper)/launch/$(arg multirotor)" />
 
 	<!-- Spawns the turtlebots.  Can add or subtract more bots here. -->
         <group if="$(arg spawn_turtles)">
