@@ -2,7 +2,7 @@
 <launch>
 
 	<!-- Switch between waypoint or dubins path mode with this argument -->
-	<arg name="waypointmode" value="false"/>
+	<arg name="waypointmode" value="true"/>
 
 	<!-- Launches the reef estimator -->
 	<arg name="control_mode" value="altitude_hold"/>
