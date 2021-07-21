@@ -1,0 +1,67 @@
+<launch>
+
+ <arg name="fleet_controller_file" default="$(find fleet_controller)/params/basic_params.yaml"/>
+    <arg name="model" default="burger"/>
+
+    <arg name="agent_0"  default="agent_0"/>
+    <group ns="$(arg agent_0)">
+            <arg name="agent_name" default="$(arg agent_0)"/>
+            <arg name="x_pos" default="1."/>
+            <arg name="y_pos" default="0."/>
+            <arg name="z_pos" default="0.0"/>
+            <arg name="yaw"   default="90.0"/>
+            <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+            <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+                <param name="publish_frequency" type="double" value="50.0" />
+                <param name="tf_prefix" value="$(arg agent_name)" />
+            </node>
+
+            <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
+            <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+                <rosparam file="$(arg fleet_controller_file)" />
+                <remap from="velocity_publisher" to="cmd_vel"/>
+            </node>
+    </group>
+    <arg name="agent_1"  default="agent_1"/>
+    <group ns="$(arg agent_1)">
+        <arg name="agent_name" default="$(arg agent_1)"/>
+        <arg name="x_pos" default="1.576"/>
+        <arg name="y_pos" default="-1.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="yaw"   default="90.0"/>
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg agent_name)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
+        <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+            <rosparam file="$(arg fleet_controller_file)" />
+            <remap from="velocity_publisher" to="cmd_vel"/>
+        </node>
+    </group>
+    <arg name="agent_2"  default="agent_2"/>
+    <group ns="$(arg agent_2)">
+        <arg name="agent_name" default="$(arg agent_2)"/>
+        <arg name="x_pos" default="0.4233"/>
+        <arg name="y_pos" default="-1.0"/>
+        <arg name="z_pos" default="0.0"/>
+        <arg name="yaw"   default="90.0"/>
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+            <param name="publish_frequency" type="double" value="50.0" />
+            <param name="tf_prefix" value="$(arg agent_name)" />
+        </node>
+
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
+        <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+            <rosparam file="$(arg fleet_controller_file)" />
+            <remap from="velocity_publisher" to="cmd_vel"/>
+        </node>
+    </group>
+
+
+
+</launch>
+
