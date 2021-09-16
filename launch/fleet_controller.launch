@@ -21,6 +21,11 @@
                 <rosparam file="$(arg fleet_controller_file)" />
                 <remap from="velocity_publisher" to="cmd_vel"/>
             </node>
+		<node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
+		<remap from="/cmd_vel" to="/$(arg agent_0)/cmd_vel" />
+		<remap from="/odom" to="/$(arg agent_0)/odom" />
+		</node>
+
     </group>
     <arg name="agent_1"  default="agent_1"/>
     <group ns="$(arg agent_1)">
@@ -40,6 +45,10 @@
             <rosparam file="$(arg fleet_controller_file)" />
             <remap from="velocity_publisher" to="cmd_vel"/>
         </node>
+		<node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
+		<remap from="/cmd_vel" to="/$(arg agent_1)/cmd_vel" />
+		<remap from="/odom" to="/$(arg agent_1)/odom" />
+		</node>
     </group>
     <arg name="agent_2"  default="agent_2"/>
     <group ns="$(arg agent_2)">
@@ -59,6 +68,10 @@
             <rosparam file="$(arg fleet_controller_file)" />
             <remap from="velocity_publisher" to="cmd_vel"/>
         </node>
+		<node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
+		<remap from="/cmd_vel" to="/$(arg agent_2)/cmd_vel" />
+		<remap from="/odom" to="/$(arg agent_2)/odom" />
+		</node>
     </group>
 
 
