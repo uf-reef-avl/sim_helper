@@ -1,8 +1,9 @@
 <launch>
-
+ <arg name="fleet_controller_global_file" default="$(find fleet_controller)/params/global_params.yaml"/>
  <arg name="fleet_controller_file" default="$(find fleet_controller)/params/basic_params.yaml"/>
+<rosparam file="$(arg fleet_controller_global_file)" />
     <arg name="model" default="burger"/>
- <param name="enable_gps" type="bool" value="False" />
+ <!--param name="enable_gps" type="bool" value="False" /-->
 
     <arg name="agent_0"  default="agent_0"/>
     <group ns="$(arg agent_0)">
@@ -26,6 +27,7 @@
             <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen">
   		<remap from="cmd_vel" to="/$(arg agent_0)/cmd_vel" />
   		<remap from="odom" to="/$(arg agent_0)/odom" />
+                <param name="enable_gps" value="True"/>
  	    </node>
  	   
     </group>
@@ -33,8 +35,8 @@
     <arg name="agent_1"  default="agent_1"/>
     <group ns="$(arg agent_1)">
         <arg name="agent_name" default="$(arg agent_1)"/>
-        <arg name="x_pos" default="1.576"/>
-        <arg name="y_pos" default="-1.0"/>
+        <arg name="x_pos" default="1.8649"/>
+        <arg name="y_pos" default="-1.5"/>
         <arg name="z_pos" default="0.0"/>
         <arg name="yaw"   default="90.0"/>
         <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
@@ -52,14 +54,15 @@
 	 <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
   	    <remap from="cmd_vel" to="/$(arg agent_1)/cmd_vel" />
   	    <remap from="odom" to="/$(arg agent_1)/odom" />
+            <param name="enable_gps" value="true"/>
         </node>
     </group>
 
     <arg name="agent_2"  default="agent_2"/>
     <group ns="$(arg agent_2)">
         <arg name="agent_name" default="$(arg agent_2)"/>
-        <arg name="x_pos" default="0.4233"/>
-        <arg name="y_pos" default="-1.0"/>
+        <arg name="x_pos" default="0.1351"/>
+        <arg name="y_pos" default="-1.5"/>
         <arg name="z_pos" default="0.0"/>
         <arg name="yaw"   default="90.0"/>
         <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />
@@ -76,6 +79,7 @@
         <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
   	    <remap from="cmd_vel" to="/$(arg agent_2)/cmd_vel" />
   	    <remap from="odom" to="/$(arg agent_2)/odom" />
+            <param name="enable_gps" value="true" />
         </node>
     </group>
 
