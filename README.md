@@ -1,25 +1,46 @@
 **Sim_Helper**
 ==============
 
-This module simulates various path finding algorithms through virtual quadcopter and turtlebot agents.
+This module simulates the explorer relay through virtual quadcopter and turtlebot agents.
 
-
-**Setting Up The Simulation**
------------------------------
-
-- To adjust the number of simulated vehicles modify the __launch_sim.launch__ file.  Changing the __spawn_turtles__ argument enables/disables the list of turtlebots.
-
-- To switch between the two basic modes of flying (basic waypoints and Dubins path) change the __waypointmode__ argument.  Default behavior is __True__ which starts the basic waypoints algorithm.
+**Install the package:**
+--------------------
+	
+		mkdir -p ~/explorer_relay_ws/src
+		cd ~/explorer_relay_ws/src
+		git pull ***this package***
+		cd ***this package***
+		git submodule update --init --recursive
+		cd ~/explorer_relay_ws
+		catkin build
 
 
 **Running The Simulation**
 --------------------------
 
-- In one terminal run __python Master.py__ from the scripts directory.
+- Open 4 terminal
 
-- Wait a few seconds until __Autopilot ARMED__ and __RC override active__ are printed and then in another terminal run __roslaunch sim_estimator.launch__ from the launch directory.
+- Send source all of them with :
 
-- If the simulation is set to run the setpoint generator code, wait until __Takeoff!__ is printed in the second terminal and then use __rosparam set /setpoint_publisher/active true__ if you are using the setpoint_generator to start the simulated quadcopter.  Use __rosparam set /setpoint_publisher/active false__ to signal the quadcopter to head back to the origin.
-Otherwise, if you are using dubins path, use __rosparam set /setpoint_publisher/activaction false__ to launch it.
+		source ~/explorer_relay_ws/devel/setup.bash
+
+
+- In the first terminal, launch the simulation:
+
+	cd ~/explorer_relay_ws
+	python src/relay_explorer_bundle/sim_helper/scripts/Master.py
+
+- When it is fully launched, send the following command in another terminal, to start the quad:
+
+	roslaunch relay_controller exp_launch.launch
+
+- Then in another terminal launch the quad controller:
+
+	roslaunch relay_controller relay_controller.launch
+
+- At the beginning all the bots move thanks to the gazebo odom topic, use the following line to make them use their position estimator (launch this command after seeing the log : "Quad give gps" inside the first terminal, it means that the estimator has been updated with at least one gps measurement):
+
+	rosparam set /mode "estimator"
+
 
 
