@@ -8,8 +8,8 @@ This module simulates the explorer relay through virtual quadcopter and turtlebo
 	
 		mkdir -p ~/explorer_relay_ws/src
 		cd ~/explorer_relay_ws/src
-		git pull ***this package***
-		cd ***this package***
+		git clone http://10.251.72.180/explorer-relay-demo/relay_explorer_bundle.git
+		cd relay_explorer_bundle/
 		git submodule update --init --recursive
 		cd ~/explorer_relay_ws
 		catkin build
