@@ -19,10 +19,10 @@
             </node>
 
             <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
-            <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+            <!--node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
                 <rosparam file="$(arg fleet_controller_file)" />
                 <remap from="velocity_publisher" to="cmd_vel"/>
-            </node>
+            </node-->
 
             <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen">
   		<remap from="cmd_vel" to="/$(arg agent_0)/cmd_vel" />
@@ -31,6 +31,19 @@
  	    </node>
  	   
     </group>
+
+
+    <node pkg="reef_msgs" type="OdomNWU2PoseStampedNED_node" name="agent_1_odom_ned">
+<remap from="odom_nwu" to="agent_1/odom"/>
+        <remap from="pose_stamped_ned" to="follower_1_NED"/>
+  </node>
+
+    <node pkg="reef_msgs" type="OdomNWU2PoseStampedNED_node" name="agent_2_odom_ned">
+<remap from="odom_nwu" to="agent_2/odom"/>
+        <remap from="pose_stamped_ned" to="follower_2_NED"/>
+  </node>
+
+
 
     <arg name="agent_1"  default="agent_1"/>
     <group ns="$(arg agent_1)">
@@ -46,16 +59,40 @@
         </node>
 
         <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
-        <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+        <!--node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
             <rosparam file="$(arg fleet_controller_file)" />
             <remap from="velocity_publisher" to="cmd_vel"/>
-        </node>
+        </node-->
 
 	 <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
+  	    <remap from="aruco" to="aruco_follower_1" />
   	    <remap from="cmd_vel" to="/$(arg agent_1)/cmd_vel" />
   	    <remap from="odom" to="/$(arg agent_1)/odom" />
             <param name="enable_gps" value="true"/>
         </node>
+
+
+
+
+
+
+        <rosparam command="load" file="$(find verify_aruco)/params/body_to_camera/body_to_camera_NED_identity.yaml" />
+        <rosparam command="load" file="$(find verify_aruco)/params/boardbody_to_aruco/boardbody_to_aruco_rotation_180_x_-90_y_-90_z_back_of_robot.yaml" />
+    <node pkg="verify_aruco" name="verify_aruco_follower_1" type="verify_aruco">
+
+        <remap from="fake_charuco" to="aruco_follower_1"/>
+        <remap from="tf_cam" to="/follower_1_NED"/>
+        <remap from="tf_calib" to="/leader_pose_stamped_NED"/>
+	<param name ="send_gps" value="false"/>
+        <param name="publishing_frequency" value="24"/> <!--rate of the charuco published data: 24 is considered as the human eye rate-->
+        <param name="azimuth_threshold" value="3.14"/> <!--yaw detection threshold in rad-->
+        <param name="elevation_threshold" value="3.14"/> <!-- x,y detection threshold in rad-->
+        <param name="z_threshold" value="2.0"/> <!--altitude detection threshold in meter-->
+    </node>
+
+
+
+
     </group>
 
     <arg name="agent_2"  default="agent_2"/>
@@ -72,16 +109,41 @@
         </node>
 
         <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
-        <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+        <!--node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
             <rosparam file="$(arg fleet_controller_file)" />
             <remap from="velocity_publisher" to="cmd_vel"/>
-        </node>
+        </node-->
         <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
+  	    <remap from="aruco" to="aruco_follower_2" />
   	    <remap from="cmd_vel" to="/$(arg agent_2)/cmd_vel" />
   	    <remap from="odom" to="/$(arg agent_2)/odom" />
             <param name="enable_gps" value="true" />
         </node>
+
+
+
+
+        <rosparam command="load" file="$(find verify_aruco)/params/body_to_camera/body_to_camera_NED_identity.yaml" />
+        <rosparam command="load" file="$(find verify_aruco)/params/boardbody_to_aruco/boardbody_to_aruco_rotation_180_x_-90_y_-90_z_back_of_robot.yaml" />
+    <node pkg="verify_aruco" name="verify_aruco_follower_2" type="verify_aruco" >
+
+        <remap from="fake_charuco" to="aruco_follower_2"/>
+        <remap from="tf_cam" to="/follower_2_NED"/>
+        <remap from="tf_calib" to="/leader_pose_stamped_NED"/>
+	<param name ="send_gps" value="false"/>
+        <param name="publishing_frequency" value="24"/> <!--rate of the charuco published data: 24 is considered as the human eye rate-->
+        <param name="azimuth_threshold" value="3.14"/> <!--yaw detection threshold in rad-->
+        <param name="elevation_threshold" value="3.14"/> <!-- x,y detection threshold in rad-->
+        <param name="z_threshold" value="2.0"/> <!--altitude detection threshold in meter-->
+    </node>
+
+
+
+
+
+
     </group>
+
 
 
 
