@@ -19,10 +19,10 @@
             </node>
 
             <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
-            <!--node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+            <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
                 <rosparam file="$(arg fleet_controller_file)" />
                 <remap from="velocity_publisher" to="cmd_vel"/>
-            </node-->
+            </node>
 
             <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen">
   		<remap from="cmd_vel" to="/$(arg agent_0)/cmd_vel" />
@@ -59,10 +59,10 @@
         </node>
 
         <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
-        <!--node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+        <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
             <rosparam file="$(arg fleet_controller_file)" />
             <remap from="velocity_publisher" to="cmd_vel"/>
-        </node-->
+        </node>
 
 	 <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
   	    <remap from="aruco" to="aruco_follower_1" />
@@ -109,10 +109,10 @@
         </node>
 
         <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" output="log" args="-urdf -model $(arg agent_name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
-        <!--node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
+        <node name="fleet_controller" pkg="fleet_controller" type="fleet_controller_node" clear_params="true" output = "screen">
             <rosparam file="$(arg fleet_controller_file)" />
             <remap from="velocity_publisher" to="cmd_vel"/>
-        </node-->
+        </node>
         <node name="pose_estimator" pkg="turtlebot_kinematic_model" type="pose_estimator_package_node.py" output="screen" >
   	    <remap from="aruco" to="aruco_follower_2" />
   	    <remap from="cmd_vel" to="/$(arg agent_2)/cmd_vel" />
