@@ -13,9 +13,9 @@
 		<rosparam file="$(find reef_estimator)/params/basic_params.yaml" />
                 <rosparam>
                     enable_rgbd: false
-                    enable_sonar: true
+                    enable_sonar: false
                     enable_mocap_xy: true
-                    enable_mocap_z: false
+                    enable_mocap_z: true
                 </rosparam>
 		<remap from="mocap_ned" to="pose_stamped"/>
 		<remap from="mocap_velocity/body_level_frame" to="velocity/body_level_frame"/>
