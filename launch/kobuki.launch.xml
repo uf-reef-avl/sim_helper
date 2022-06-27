@@ -1,25 +1,28 @@
 <!-- Used to spawn turtlebots -->
 
 <launch>
-  <arg name="name" default="" />
-  <arg name="x" default="0.0" />
-  <arg name="y" default="0.0" />
-
-  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find sim_helper)/urdf/kobuki_hexagons_asus_xtion_pro.urdf.xacro'" />
-  <param name="robot_description" command="$(arg urdf_file)" />
 
   <!-- Gazebo model spawner -->
-  <node name="spawn_turtlebot_model" pkg="gazebo_ros" type="spawn_model"
-        args="$(optenv ROBOT_INITIAL_POSE) -urdf -param robot_description -model $(arg name)/mobile_base -x $(arg x) -y $(arg y)"/>
+  <arg name="name" default="robot" />
+  <arg name="x" default="1.0" />
+  <arg name="y" default="1.0" />
+  <arg name="z" default="0.0"/>
+  <arg name="yaw" default="0.0"/>
+  <param name="robot_description" command="$(find xacro)/xacro $(find turtlebot3_description)/urdf/turtlebot3_burger.urdf.xacro" />
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_statepublisher" output="screen">
+      <param name="publish_frequency" type="double" value="50.0" />
+      <param name="tf_prefix" value="$(arg name)" />
+    </node>
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg name)/mobile_base -x $(arg x) -y $(arg y) -z $(arg z) -Y $(arg yaw) -param robot_description"/> 
   
-  <!-- Velocity muxer -->
-  <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
+  <!-- Velocity muxer. Not sure if this is needed or not -->
+  <!--<node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>
   <node pkg="nodelet" type="nodelet" name="cmd_vel_mux"
         args="load yocs_cmd_vel_mux/CmdVelMuxNodelet mobile_base_nodelet_manager">
     <param name="yaml_cfg_file" value="$(find turtlebot_bringup)/param/mux.yaml" />
     <remap from="cmd_vel_mux/output" to="mobile_base/commands/velocity"/>
-  </node>
+  </node> -->
 
   <!-- Bumper/cliff to pointcloud (not working, as it needs sensors/core messages) -->
-  <include file="$(find turtlebot_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/>
+  <!-- <include file="$(find turtlebot3_bringup)/launch/includes/kobuki/bumper2pc.launch.xml"/> --> 
 </launch>
