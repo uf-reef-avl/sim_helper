@@ -6,89 +6,72 @@ import time
 import os
 import yaml
 from Odometry_to_PoseStamped import odometry_to_posestamped
+from frame_conversion import frame_conversion
 
-from rosflight_msgs.msg import *
-from rosflight_msgs.srv import *
+from mavros_msgs.msg import *
+from mavros_msgs.srv import *
+from geometry_msgs.msg import PoseStamped
 from std_srvs.srv import *
 
+class RC_Code:
 
+    def __init__(self):
+        self.current_state = State()
+        self.current_pose = PoseStamped()
+
+        # Setup publisher #
+        rospy.init_node('RC', anonymous=False)
+        self.rc_pub = rospy.Publisher('/mavros/rc/override', OverrideRCIn, queue_size=20)
+        self.state_sub = rospy.Subscriber("/mavros/state", State, self.state_cb)
+        self.pose_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.pose_cb)
+
+        # Setup conversion node #
+        otp = odometry_to_posestamped()
+        if rospy.get_param("/use_px4_sitl", False):
+            frame_conversion()
+
+        # Setup service calls
+        arming_client = rospy.ServiceProxy('/mavros/cmd/arming', CommandBool)
+        set_mode_client = rospy.ServiceProxy('/mavros/set_mode', SetMode)
+
+
+        r = rospy.Rate(50)
+        rospy.sleep(2.0)
+        last_request = rospy.get_rostime()
+
+        i = 0
+        while not rospy.is_shutdown():
+            cmd = OverrideRCIn()
+            cmd.channels = [1500, 1500, 1500, 1500, 1500, 1500, 2000, 1500,0,0,0,0,0,0,0,0,0,0]
+            now = rospy.get_rostime()
+            if i < 100:
+                pass
+            elif self.current_state.mode != "OFFBOARD":
+                if self.current_state.armed == False and (now - last_request > rospy.Duration(2)):
+                    cmd.channels = [1500, 1500, 1500, 1500, 1500, 1500, 2000, 1500,0,0,0,0,0,0,0,0,0,0]
+                    arming_client(True)
+                    last_request = now
+                elif (self.current_state.mode != 'POSCTL' and self.current_state.mode != 'OFFBOARD') and (now - last_request > rospy.Duration(2)):
+                    set_mode_client(base_mode=0, custom_mode="POSCTL")
+                    last_request = now
+                elif (self.current_state.mode == 'POSCTL' and self.current_state.armed == True):
+                    cmd.channels = [self.throttle, 1500, 1500, 1500, 1500, 1500, 2000, 1500,0,0,0,0,0,0,0,0,0,0]
+            self.rc_pub.publish(cmd)
+            i+=1
+
+            r.sleep()
+
+        rospy.loginfo('RC node has shutdown')
+        rospy.signal_shutdown()
+
+    def state_cb(self, msg):
+        self.current_state = msg
+        
+    def pose_cb(self, msg):
+        self.current_pose = msg
+        self.throttle = 1750 + (1 - self.current_pose.pose.position.z) * 250
+        #self.throttle = 1800
 def main():
-
-
-    file_path = os.path.dirname(__file__)
-    if file_path != "":
-        os.chdir(file_path)
-
-    stream = open("../params/script_params.yaml", 'r')
-    dictionary = yaml.load(stream)
-    # for key, value in dictionary.items():
-    #     print (key + " : " + str(value))
-
-
-    rospy.init_node('RC', anonymous=False)
-
-    # Setup conversion node #
-
-    otp = odometry_to_posestamped()
-
-    r = rospy.Rate(50)
-
-    # Setup publisher #
-
-    pub = rospy.Publisher('/multirotor/RC', RCRaw, queue_size=20)
-
-    # Setup parameters #
-
-    if dictionary["use_imu"]:
-
-        rospy.wait_for_service('calibrate_imu')
-        imu = rospy.ServiceProxy('calibrate_imu', Trigger)
-        imu()
-
-    if dictionary["use_mixer"]:
-
-        rospy.wait_for_service('param_set')
-        mixer = rospy.ServiceProxy('param_set', ParamSet)
-        mixer("MIXER", dictionary["mixer"])
-
-    channel = rospy.ServiceProxy('param_set', ParamSet)
-
-    if dictionary["use_arm_channel"]:
-
-        channel('ARM_CHANNEL', dictionary["channel"])
-
-    if dictionary["use_min_throttle"]:
-
-        minimum = rospy.ServiceProxy('param_set', ParamSet)
-        minimum("MIN_THROTTLE", dictionary["min_throttle"])
-
-    rospy.sleep(5.0)
-
-    i = 0
-
-    while not rospy.is_shutdown():
-
-        cmd = RCRaw()
-        cmd.values = [1500, 1500, 1000, 1500, 1000, 2000, 2000, 1000]
-
-        if i == 300:
-            channel('ARM_CHANNEL', 6)
-            i += 1
-
-        elif 49 < i < 300:
-            i += 1
-
-        elif i < 50:
-            cmd.values[4] = 2000
-            i += 1
-
-        pub.publish(cmd)
-
-        r.sleep()
-
-    rospy.loginfo('RC node has shutdown')
-    rospy.signal_shutdown()
-
-
+    RC_Code()
 if __name__ == '__main__':
     main()

@@ -6,33 +6,54 @@ import rospkg
 import roslaunch
 import time
 import RC_code
+import sys
+import getopt
 
 
-def main():
+def main(argv):
 
-	# Setting up launch files and nodes #
-	rospack = rospkg.RosPack()
-	path = rospack.get_path('sim_helper')
+    # Selecting Flight Stack
+    flight_stack = "rosflight"
+    options = "i:"
+    long_options = ["input"]
+    try:
+        # Parsing argument
+        arguments, values = getopt.getopt(argv, options, long_options) 
+    except getopt.GetoptError:
+        print('Options:\n -i <flightstack> (rosflight, px4)\n')
+        sys.exit(2)
+    for opt, arg in arguments:
+        if opt == '-i':
+            flight_stack = arg 
 
-	uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
-	roslaunch.configure_logging(uuid)
-	rotor_launch = roslaunch.parent.ROSLaunchParent(uuid, [path+"/launch/launch_sim.launch"])
-	rotor_launch.start()
-	rospy.loginfo("started")
+    # Setting up launch files and nodes #
+    rospack = rospkg.RosPack()
+    path = rospack.get_path('sim_helper')
+    uuid = roslaunch.rlutil.get_or_generate_uuid(None, False)
+    roslaunch.configure_logging(uuid)
+    cli_args = [path + "/launch/launch_sim.launch"]
 
-	rospy.sleep(5.0)
+    # Adding necessary arguments to launch file
+    if flight_stack == "px4":
+        cli_args.append('px4:=True')
 
-	node = roslaunch.core.Node(package='rosflight', node_type='rosflight_io', name='rosflight_io', namespace='/', args='_udp:=true', output='screen')
+    # Launching Launch file 
+    roslaunch_args = cli_args[1:]
+    roslaunch_file = [(roslaunch.rlutil.resolve_launch_arguments(cli_args)[0], roslaunch_args)]
+    rotor_launch = roslaunch.parent.ROSLaunchParent(uuid, roslaunch_file)
+    rotor_launch.start()
+    rospy.loginfo("started")
+    rospy.sleep(5.0)
+    
+    # Launch rosflight (if necessary)
+    if flight_stack == "rosflight":
+	    node = roslaunch.core.Node(package='rosflight', node_type='rosflight_io', name='rosflight_io', namespace='/', args='_udp:=true', output='screen')
+	    flight_launch = roslaunch.scriptapi.ROSLaunch()
+	    flight_launch.start()
+	    flight_launch.launch(node)
+	    rospy.sleep(3.0)
 
-	flight_launch = roslaunch.scriptapi.ROSLaunch()
-	flight_launch.start()
-
-	flight_launch.launch(node)
-
-	rospy.sleep(3.0)
-
-	RC_code.main()
-
+    RC_code.main()
 
 if __name__ == '__main__':
-	main()
+    main(sys.argv[1:])

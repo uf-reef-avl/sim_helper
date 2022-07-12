@@ -1,11 +1,21 @@
+<?xml version="1.0"?>
+
 <!-- Launches an empty world and simulated vehicles in Gazebo.  Called by Master.py-->
 
 <launch>
 
   <!-- Spawns the simulated multirotor -->
   <arg name="multirotor" value="camera_multirotor.launch" />
-  <include file="$(find sim_helper)/launch/$(arg multirotor)" />
-
+  <arg name ="px4" default="False"/>
+  
+  <group if="$(arg px4)">
+    <include file="$(find sim_helper)/launch/mavros_posix_sitl.launch" />
+    <param name="use_px4_sitl" type="bool" value="True"/>
+  </group>
+ 
+  <group unless="$(arg px4)">
+    <include file="$(find sim_helper)/launch/$(arg multirotor)" />
+  </group>
 
   <!-- Enables/Disables spawning turtlebots -->
   <arg name="spawn_turtles" value="False"/>

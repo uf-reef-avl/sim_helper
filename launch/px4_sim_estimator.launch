@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!-- -->
 <launch>
 
@@ -6,6 +7,7 @@
 
 	<!-- Launches the reef estimator -->
 	<arg name="control_mode" value="altitude_hold"/>
+
 	<arg name="vehicle" default="sim"/>
 	<node name="reef_estimator" pkg="reef_estimator" type="reef_estimator" output="screen">
 		<rosparam file="$(find reef_estimator)/params/xy_est_params.yaml" />
@@ -13,13 +15,17 @@
 		<rosparam file="$(find reef_estimator)/params/basic_params.yaml" />
                 <rosparam>
                     enable_rgbd: false
-                    enable_sonar: true
+                    enable_sonar: false
                     enable_mocap_xy: true
-                    enable_mocap_z: false
+                    enable_mocap_z: true
+                    estimator_dt: 0.005
                 </rosparam>
 		<remap from="mocap_ned" to="pose_stamped"/>
 		<remap from="mocap_velocity/body_level_frame" to="velocity/body_level_frame"/>
 		<remap from="rgbd_velocity_body_frame" to="rgbd_velocity/body_level_frame"/>
+		<remap from="rc_raw" to="/mavros/rc/override"/>
+		<remap from="imu/data" to="/mavros/imu/data"/>
+		<remap from="status" to="/mavros/extended_state"/>
 	</node>
 
 	<!-- Launches the position to velocity node -->
@@ -29,28 +35,5 @@
 		<remap from="odom" to="multirotor/truth/NED"/> 
 	</node>
 
-	<!-- Basic waypoints -->
-	<group if="$(arg waypointmode)">
-		<arg name="waypoints_file" default="$(find setpoint_generator)/waypoint_files/basic_waypoints.yaml" />
-		<node name="setpoint_publisher" pkg="setpoint_generator" type="get_setpoint_node.py" clear_params="true" output="screen">
-			<rosparam file="$(arg waypoints_file)"/>
-			<rosparam file="$(find setpoint_generator)/params/basic_param.yaml"/>
-		</node>
-	</group>
-
-	<!-- Dubins path -->
-	<group unless="$(arg waypointmode)">
-		<arg name="waypoints_file" default="$(find dubins_path)/waypoint_files/basic_waypoints.yaml"/>
-		<rosparam command="load" file="$(find dubins_path)/param/basic_param.yaml"/>
-
-		<node name="setpoint_publisher" pkg="dubins_path" type="get_setpoint_node.py" clear_params="true" output = "screen">
-			<rosparam file="$(arg waypoints_file)" />
-			<remap from="velocity_publisher" to="/mobile_base/commands/velocity"/>
-			<remap from="$(arg vehicle)/ned/pose" to="multirotor/truth/NED"/>
-		</node>
-	</group>
-
-	<rosparam file="$(find sim_helper)/params/$(arg vehicle)_pid.yaml"/>
-	<node name="reef_control_pid" pkg="reef_control" type="reef_control_node" output="screen"/>
 
 </launch>
