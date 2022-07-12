@@ -3,23 +3,43 @@
 
 This module simulates various path finding algorithms through virtual quadcopter and turtlebot agents.
 
-
 **Setting Up The Simulation**
 -----------------------------
+1. Clone PX4 Firmware 
 
-- To adjust the number of simulated vehicles modify the __launch_sim.launch__ file.  Changing the __spawn_turtles__ argument enables/disables the list of turtlebots.
+   ```bash
+   cd ~
+   git clone https://github.com/PX4/Firmware.git --recursive
+   cd ~/Firmware
+   ```
+1. Install [PX4 dependencies](http://dev.px4.io/en/setup/dev_env_linux_ubuntu.html#common-dependencies). 
+   ```bash
+   # Install PX4 "common" dependencies.
+   ./Tools/setup/ubuntu.sh --no-sim-tools --no-nuttx
+   ```
+1. Build Firmware
+   ```bash
+   # Build and run simulation
+   make px4_sitl_default gazebo
+   # Ctrl+C after Gazebo opens
+   ```
+1. Source "launch_common.sh" (Do this every time on first launch)
+    ```bash
+    source ~/catkin_ws/src/reef_estimator_sim_bundle/sim_helper/launch/launch_common.sh
+    # you may have to adjust this path and launch_common.sh to fit your directories
+    ```
 
-- To switch between the two basic modes of flying (basic waypoints and Dubins path) change the __waypointmode__ argument.  Default behavior is __True__ which starts the basic waypoints algorithm.
+- To adjust the number of simulated vehicles modify the `launch/launch_sim.launch` file.  Changing the `spawn_turtles` argument enables/disables the list of turtlebots.
+
+- To switch between the two basic modes of flying (basic waypoints and Dubins path) change the `waypointmode` argument.  Default behavior is `True` which starts the basic waypoints algorithm.
 
 
 **Running The Simulation**
 --------------------------
 
-- In one terminal run __python Master.py__ from the scripts directory.
-
-- Wait a few seconds until __Autopilot ARMED__ and __RC override active__ are printed and then in another terminal run __roslaunch sim_estimator.launch__ from the launch directory.
-
-- If the simulation is set to run the setpoint generator code, wait until __Takeoff!__ is printed in the second terminal and then use __rosparam set /setpoint_publisher/active true__ if you are using the setpoint_generator to start the simulated quadcopter.  Use __rosparam set /setpoint_publisher/active false__ to signal the quadcopter to head back to the origin.
-Otherwise, if you are using dubins path, use __rosparam set /setpoint_publisher/activaction false__ to launch it.
-
-
+- In one terminal run `python scripts/Master.py -i px4`.
+- In another terminal run `roslaunch sim_helper px4_sim_est_control.launch`
+- If the simulation is set to run the setpoint generator code, wait until __Takeoff!__ is printed in the second terminal and then use `rosparam set /setpoint_publisher/active true` if you are using the setpoint_generator to start the simulated quadcopter.  Use `rosparam set /setpoint_publisher/active false` to signal the quadcopter to head back to the origin.
+Otherwise, if you are using dubins path, use `rosparam set /setpoint_publisher/activaction false` to launch it.
+- In another terminal set PX4 to OFFBOARD mode with `rosservice call /mavros/set_mode "base_mode: 0 custom_mode: 'OFFBOARD'"`
+ 
