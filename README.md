@@ -43,4 +43,8 @@ This module simulates various path finding algorithms through virtual quadcopter
 Otherwise, if you are using dubins path, use `rosparam set /setpoint_publisher/activaction false` to launch it.
 - In another terminal set PX4 to OFFBOARD mode with `rosservice call /mavros/set_mode "base_mode: 0 custom_mode: 'OFFBOARD'"`
 *Note: PX4 Params may have to be set in the included params/px4_sitl.param file through QGC
+- To change the IMU Publishing rate (this controls the rate REEF Estimator runs at) use mavlink stream commmands:
+   ```mavlink stream -d <telem_port> -s Attitude -r <rate>```
+   This can either be done via the mavlink console in QGC, or put into the etc/extras.txt on the Pixhawk
+
  
