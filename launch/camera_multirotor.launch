@@ -9,7 +9,7 @@
   <arg name="z"                   default="0.1"/>
   <arg name="yaw"                 default="0"/>
   <arg name="paused"              default="false"/>
-  <arg name="gui"                 default="true"/>
+  <arg name="gui"                 default="false"/>
   <arg name="verbose"             default="false"/>
   <arg name="debug"               default="false"/>
 
